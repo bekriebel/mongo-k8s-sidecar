@@ -134,15 +134,9 @@ var addNewMembers = function(rsConfig, addrsToAdd) {
   var memberIds = [];
   var newMemberId = 0;
 
+  // Build list of existing IDs
   for (var i in rsConfig.members) {
     memberIds.push(rsConfig.members[i]._id);
-  }
-
-  for (var i = 0; i <= 255; i++) {
-    if (!memberIds.includes(i)) {
-      newMemberId = i;
-      break;
-    }
   }
 
   for (var i in addrsToAdd) {
@@ -162,6 +156,15 @@ var addNewMembers = function(rsConfig, addrsToAdd) {
 
     if (exists) {
       continue;
+    }
+
+    // Search for next ID and add to future exclusion list
+    for (var i = 0; i <= 255; i++) {
+      if (!memberIds.includes(i)) {
+        newMemberId = i;
+        memberIds.push(newMemberId);
+        break;
+      }
     }
 
     var cfg = {
