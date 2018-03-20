@@ -130,12 +130,18 @@ var addNewReplSetMembers = function(db, addrToAdd, addrToRemove, shouldForce, do
 var addNewMembers = function(rsConfig, addrsToAdd) {
   if (!addrsToAdd || !addrsToAdd.length) return;
 
-  //Follows what is basically in mongo's rs.add function
-  var max = 0;
+  // Find an available _id value (0-255)
+  var memberIds = [];
+  var newMemberId = 0;
 
   for (var i in rsConfig.members) {
-    if (rsConfig.members[i]._id > max) {
-      max = rsConfig.members[i]._id;
+    memberIds.push(rsConfig.members[i]._id);
+  }
+
+  for (var i = 0; i <= 255; i++) {
+    if (!memberIds.includes(i)) {
+      newMemberId = i;
+      break;
     }
   }
 
@@ -159,7 +165,7 @@ var addNewMembers = function(rsConfig, addrsToAdd) {
     }
 
     var cfg = {
-      _id: ++max,
+      _id: newMemberId,
       host: addrToAdd
     };
 
